@@ -132,16 +132,81 @@ def recursiveDls(node, actions, problem, limit, visited):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    start_state = problem.getStartState();
-    open_set = set(start_state)
-    closed_set = set()
+    # return ['A']
+    # [state, action, g_cost, f_cost]
+
+    # start_state = [problem.getStartState(), [], 0, f_, 
+    # start_state = problem.getStartState()
     g_cost = 0
-    h_cost = g_cost + heuristic(start_state, problem)
+    f_cost = g_cost + heuristic(problem.getStartState(), problem)
+    start_state = [problem.getStartState(), [], g_cost, f_cost] 
+    open_set = [start_state]
+    closed_set = []
 
     while open_set:
-        current = 
+        current = returnLowestFcost(open_set)
+        print "current"
+        print current
 
-def returnLowestFcost
+        if problem.isGoalState(current[0]):
+            return current[1]
+        open_set = removeListFrom2DList(open_set, current)
+        closed_set.append(current)
+        for (successor, action, cost) in problem.getSuccessors(current[0]):
+            if existsInLists(successor, closed_set):
+                continue
+
+            tentative_g_cost = current[2] + cost
+            # print tentative_g_cost
+            #  need to optimized!!
+            sucessor_already_visited = existsInLists(successor, open_set)
+            if sucessor_already_visited:
+                if tentative_g_cost < sucessor_already_visited[2]:
+                    removeListFrom2DList(open_set, sucessor_already_visited)
+
+            if not existsInLists(successor, open_set) or tentative_g_cost < sucessor_already_visited[2]:
+                successor_f_cost = tentative_g_cost + heuristic(successor, problem)
+                actions = current[1] + [action]
+                successor_state = [successor, actions, tentative_g_cost, successor_f_cost]
+                print "successor_state"
+                print successor_state
+                if not existsInLists(successor, open_set):
+                    open_set.append(successor_state)
+
+    print "A* search failed"
+    return "failure"
+
+def removeListFrom2DList(doubleList, target):
+    for i in range(0, len(doubleList)):
+        if doubleList[i] == target:
+            del doubleList[i]
+            return doubleList
+    print "something is wrong!!"
+    return False
+
+def existsInLists(state, doubleList):
+    for li in doubleList:
+        if state == li[0]:
+            return li
+    return False
+
+# def returnExistsInLists(state, doubleList):
+#     for li in doubleList:
+#         if state == li[0]:
+#             return li
+#     return False
+
+def returnLowestFcost(open_set):
+    answer = []
+    minimum = float("inf")
+    for li in open_set:
+        if li[3] < minimum:
+            minimum = li[3]
+            answer = li
+    if answer:
+        return answer
+    else:
+        print "something is wrong. List shouldn't be empty"
 
 
 
