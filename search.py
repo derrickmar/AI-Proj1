@@ -29,6 +29,7 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+    #(successor, action, stepCost)
     def getSuccessors(self, state):
         """
           state: Search state
@@ -76,19 +77,73 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
+
 def iterativeDeepeningSearch(problem):
     """
     Perform DFS with increasingly larger depth.
 
     Begin with a depth of 1 and increment depth by 1 at every step.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    depth = 0
+    # for d in range(0, ):
+    while True:
+        result = depthLimitedSearch(problem, depth)
+        # print result
+        if result != "cutoff":
+            return result
+        depth += 1
+
+def depthLimitedSearch(problem, limit):
+    """
+    Helper function and DLS algorithm for iterativeDeepeningSearch
+    """
+    # print "STARTING RDLS"
+    # print "RDLS: " + problem.getStartState()
+    # return recursiveDls(problem.getStartState(), [], problem, limit, [problem.getStartState()], set(problem.getStartState()))
+    return recursiveDls(problem.getStartState(), [], problem, limit, set(problem.getStartState()))
+
+# returns a list of actions to goal node
+def recursiveDls(node, actions, problem, limit, visited):
+    cutoff = "cutoff"
+    failure = "failure"
+    if problem.isGoalState(node):
+        return actions
+    elif limit == 0:
+        return cutoff
+    else:
+        cutoff_occured = False
+        children = []
+        for child in problem.getSuccessors(node):
+            if child[0] not in visited:
+                children.append(child)
+                visited.add(child[0])
+        for (successor, action, cost) in children:
+            result = recursiveDls(successor, [action], problem, limit - 1, visited)
+            if result == cutoff:
+                cutoff_occured = True
+            elif result != failure:
+                return actions + result
+        if cutoff_occured:
+            return cutoff
+        else:
+            return failure
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start_state = problem.getStartState();
+    open_set = set(start_state)
+    closed_set = set()
+    g_cost = 0
+    h_cost = g_cost + heuristic(start_state, problem)
+
+    while open_set:
+        current = 
+
+def returnLowestFcost
+
+
 
 # Abbreviations
 bfs = breadthFirstSearch
