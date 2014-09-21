@@ -105,7 +105,7 @@ def depthLimitedSearch(problem, limit):
 
 # returns a list of actions to goal node
 def recursiveDls(node, actions, problem, limit, visited):
-    print(visited)
+    # print(visited)
     cutoff = "cutoff"
     failure = "failure"
     if problem.isGoalState(node):
@@ -135,11 +135,6 @@ def recursiveDls(node, actions, problem, limit, visited):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    # return ['A']
-    # [state, action, g_cost, f_cost]
-
-    # start_state = [problem.getStartState(), [], 0, f_, 
-    # start_state = problem.getStartState()
     g_cost = 0
     f_cost = g_cost + heuristic(problem.getStartState(), problem)
     start_state = [problem.getStartState(), [], g_cost, f_cost] 
@@ -150,7 +145,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         current = returnLowestFcost(open_set)
         # print "current"
         # print current
-
         if problem.isGoalState(current[0]):
             return current[1]
         open_set = removeListFrom2DList(open_set, current)
@@ -160,8 +154,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 continue
 
             tentative_g_cost = current[2] + cost
-            # print tentative_g_cost
-            #  need to optimized!!
             sucessor_already_visited = existsInLists(successor, open_set)
             if sucessor_already_visited:
                 if tentative_g_cost < sucessor_already_visited[2]:
