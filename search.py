@@ -192,6 +192,9 @@ def existsInLists(state, doubleList):
 #     return False
 
 def returnLowestFcost(open_set):
+    """
+    Returns the lowest Fcost in the open_set. 
+    """
     answer = []
     minimum = float("inf")
     for li in open_set:
