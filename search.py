@@ -101,10 +101,11 @@ def depthLimitedSearch(problem, limit):
     # print "STARTING RDLS"
     # print "RDLS: " + problem.getStartState()
     # return recursiveDls(problem.getStartState(), [], problem, limit, [problem.getStartState()], set(problem.getStartState()))
-    return recursiveDls(problem.getStartState(), [], problem, limit, set(problem.getStartState()))
+    return recursiveDls(problem.getStartState(), [], problem, limit, set([problem.getStartState()]))
 
 # returns a list of actions to goal node
 def recursiveDls(node, actions, problem, limit, visited):
+    print(visited)
     cutoff = "cutoff"
     failure = "failure"
     if problem.isGoalState(node):
@@ -119,11 +120,13 @@ def recursiveDls(node, actions, problem, limit, visited):
                 children.append(child)
                 visited.add(child[0])
         for (successor, action, cost) in children:
-            result = recursiveDls(successor, [action], problem, limit - 1, visited)
+            actions.append(action)
+            result = recursiveDls(successor, actions, problem, limit - 1, visited)
             if result == cutoff:
                 cutoff_occured = True
             elif result != failure:
-                return actions + result
+                return result
+            actions.pop()
         if cutoff_occured:
             return cutoff
         else:
@@ -145,8 +148,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     while open_set:
         current = returnLowestFcost(open_set)
-        print "current"
-        print current
+        # print "current"
+        # print current
 
         if problem.isGoalState(current[0]):
             return current[1]
@@ -168,8 +171,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 successor_f_cost = tentative_g_cost + heuristic(successor, problem)
                 actions = current[1] + [action]
                 successor_state = [successor, actions, tentative_g_cost, successor_f_cost]
-                print "successor_state"
-                print successor_state
+                # print "successor_state"
+                # print successor_state
                 if not existsInLists(successor, open_set):
                     open_set.append(successor_state)
 
