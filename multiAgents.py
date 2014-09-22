@@ -200,8 +200,56 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        # Collect legal moves and successor states
+        legalMoves = gameState.getLegalActions()
+
+        best_move = legalMoves[0]
+        best_score = float('-inf')
+        for move in legalMoves:
+            clone = gameState.generateSuccessor(0, move)
+            score = self.min_play(clone, gameState.getNumAgents(), 0)
+            # print score
+            if score > best_score:
+                best_move = move
+                best_score = score
+        # print best_score
+        return best_move
+
+    def min_play(self, game_state, num_agents, prev_agent):
+        if len(game_state.getLegalActions()) == 0:
+            return scoreEvaluationFunction(game_state)
+        moves = game_state.getLegalActions()
+        best_score = float('inf')
+        for move in moves:
+            newAgent = (prev_agent+1)%num_agents
+            clone = game_state.generateSuccessor(newAgent, move)
+            if (newAgent+1)%num_agents == 0:
+              score = self.max_play(clone, num_agents, newAgent)
+            else:
+              score = self.min_play(clone, num_agents, newAgent)
+            if score < best_score:
+                best_move = move
+                best_score = score
+        # print best_score
+        return best_score
+
+    def max_play(self, game_state, num_agents, prev_agent):
+        if len(game_state.getLegalActions()) == 0:
+            return scoreEvaluationFunction(game_state)
+        moves = game_state.getLegalActions()
+        best_score = float('-inf')
+        for move in moves:
+            newAgent = (prev_agent+1)%num_agents
+            clone = game_state.generateSuccessor(newAgent, move)
+            if (newAgent+1)%num_agents == 0:
+              score = self.max_play(clone, num_agents, newAgent)
+            else:
+              score = self.min_play(clone, num_agents, newAgent)
+            if score > best_score:
+                best_move = move
+                best_score = score
+        return best_score
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
