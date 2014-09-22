@@ -231,7 +231,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if score < best_score:
                 best_move = move
                 best_score = score
-        # print best_score
         return best_score
 
     def max_play(self, game_state, num_agents, prev_agent, count):
@@ -263,8 +262,56 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        legalMoves = gameState.getLegalActions(0)
+
+        best_move = legalMoves[0]
+        best_score = float('-inf')
+        for move in legalMoves:
+            clone = gameState.generateSuccessor(0, move)
+            score = self.min_play(clone, gameState.getNumAgents(), 0, 0)
+            # print score
+            if score > best_score:
+                best_move = move
+                best_score = score
+        # print best_score
+        return best_move
+
+
+    def min_play(self, game_state, num_agents, prev_agent, count):
+        newAgent = (prev_agent+1)%num_agents
+        moves = game_state.getLegalActions(newAgent)
+        if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
+            finalEval = scoreEvaluationFunction(game_state)
+            return finalEval  
+        best_score = float('inf')
+        total_mini_score = 0
+        for move in moves:
+            clone = game_state.generateSuccessor(newAgent, move)
+            if (newAgent+1)%num_agents == 0:
+              total_mini_score += self.max_play(clone, num_agents, newAgent, count+1)
+            else:
+              total_mini_score += self.min_play(clone, num_agents, newAgent, count+1)
+        # print(total_mini_score)
+        return float(total_mini_score) / float(len(moves))
+
+    def max_play(self, game_state, num_agents, prev_agent, count):
+        newAgent = (prev_agent+1)%num_agents
+        moves = game_state.getLegalActions(newAgent)
+        if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
+            finalEval = scoreEvaluationFunction(game_state)
+            return finalEval
+        best_score = float('-inf')
+        for move in moves:
+            clone = game_state.generateSuccessor(newAgent, move)
+            if (newAgent+1)%num_agents == 0:
+              score = self.max_play(clone, num_agents, newAgent, count+1)
+            else:
+              score = self.min_play(clone, num_agents, newAgent, count+1)
+            if score > best_score:
+                best_move = move
+                best_score = score
+        return best_score
 
 def betterEvaluationFunction(currentGameState):
     """
