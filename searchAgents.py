@@ -445,6 +445,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+#TODO
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -474,8 +475,11 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    # print position
+    # print foodGrid[1][1]
+    # print "as list"
+    # print foodGrid.asList()
+    return 1
 
 def mazeDistance(point1, point2, gameState):
     """

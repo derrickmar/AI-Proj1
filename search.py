@@ -138,8 +138,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     g_cost = 0
     f_cost = g_cost + heuristic(problem.getStartState(), problem)
     start_state = [problem.getStartState(), [], g_cost, f_cost] 
-    open_set = [start_state]
-    closed_set = []
+    open_set = set(start_state)
+    closed_set = set()
 
     while open_set:
         current = returnLowestFcost(open_set)
@@ -154,21 +154,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 continue
 
             tentative_g_cost = current[2] + cost
-            sucessor_already_visited = existsInLists(successor, open_set)
-            if sucessor_already_visited:
-                if tentative_g_cost < sucessor_already_visited[2]:
-                    removeListFrom2DList(open_set, sucessor_already_visited)
+            successor_already_visited = existsInLists(successor, open_set)
+            if successor_already_visited:
+                if tentative_g_cost < successor_already_visited[2]:
+                    removeListFrom2DList(open_set, successor_already_visited)
 
-            if not existsInLists(successor, open_set) or tentative_g_cost < sucessor_already_visited[2]:
+            if not existsInLists(successor, open_set) or tentative_g_cost < successor_already_visited[2]:
                 successor_f_cost = tentative_g_cost + heuristic(successor, problem)
                 actions = current[1] + [action]
                 successor_state = [successor, actions, tentative_g_cost, successor_f_cost]
                 # print "successor_state"
                 # print successor_state
                 if not existsInLists(successor, open_set):
+                    # print open_set
                     open_set.append(successor_state)
 
-    print "A* search failed"
+    print "---------------------A* search failed"
     return "failure"
 
 def removeListFrom2DList(doubleList, target):
@@ -184,12 +185,6 @@ def existsInLists(state, doubleList):
         if state == li[0]:
             return li
     return False
-
-# def returnExistsInLists(state, doubleList):
-#     for li in doubleList:
-#         if state == li[0]:
-#             return li
-#     return False
 
 def returnLowestFcost(open_set):
     """
