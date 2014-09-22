@@ -474,12 +474,40 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
     position, foodGrid = state
-    # print position
-    # print foodGrid[1][1]
-    # print "as list"
-    # print foodGrid.asList()
-    return 1
+    listOfFoods = foodGrid.asList()
+    
+    minDistance = 0
+    heuristic = 0
+
+    if (len(listOfFoods) == 0):
+        return 0 # zero heuristic for goal state
+
+    for i in range(len(listOfFoods)):
+        food = findNearestFood(position, listOfFoods) # find closest one
+        distance = manhattanDistanceBetweenPoints(position, food) # get distance
+        if i != 0 and (minDistance == 0 or minDistance > distance):
+            minDistance = distance
+        position = food # move to that new position
+        heuristic += distance
+    return heuristic-minDistance
+
+def findNearestFood(position, foods):
+    closestDistance = -1
+    index = -1
+    for i in range(len(foods)):
+        distance = manhattanDistanceBetweenPoints(position, foods[i])
+        if distance > 0 and (index == -1 or distance <= closestDistance):
+            index = i
+            closestDistance = distance
+    if (index != -1):
+        return foods[index]
+    else:
+        return ()
+
+def manhattanDistanceBetweenPoints(point1, point2):
+    return abs(point1[0]-point2[0]) + abs(point1[1]-point2[1])
 
 def mazeDistance(point1, point2, gameState):
     """
