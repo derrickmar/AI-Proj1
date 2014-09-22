@@ -43,6 +43,7 @@ class ReflexAgent(Agent):
         legalMoves = gameState.getLegalActions()
 
         # Choose one of the best actions
+
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
@@ -69,13 +70,83 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
+        currentPacPos = currentGameState.getPacmanPosition()
+        newPacPos = successorGameState.getPacmanPosition()
+        currentFood = currentGameState.getFood()
+
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        evaluation = 0
+        # print "newPacPos"
+        # print(newPacPos)
+        for ghostState in newGhostStates:
+          # print "ghostPos"
+          # print(ghostState.getPosition())
+          if isNextTo(newPacPos, ghostState.getPosition()):
+            if ghostState.scaredTimer > 0:
+              evaluation += 500
+            else:
+              evaluation -= 1000
+          if isOn(newPacPos, ghostState.getPosition()):
+            if ghostState.scaredTimer > 0:
+              evaluation += 500
+            else:
+              evaluation -= 1000
+        # print "food"
+        # print(newFood.asList())
+        for food in currentFood.asList():
+          if isOn(newPacPos, food):
+            evaluation += 50
+
+        if (successorGameState.getScore() > currentGameState.getScore):
+          evaluation += 50
+
+        if evaluation >= 0:
+          nearestFood = findNearestFood(currentPacPos, currentFood.asList())
+          # print(nearestFood)
+          if (manhattanDistanceBetweenPoints(nearestFood, currentPacPos) > 
+            manhattanDistanceBetweenPoints(nearestFood, newPacPos)):
+            evaluation += 500
+          # head towards food
+
+        return evaluation
+
+def isNextTo(obj1, obj2):
+  nearX = (abs(obj1[0]-obj2[0]) == 1) and (obj1[1] == obj2[1])
+  nearY = (abs(obj1[1]-obj2[1]) == 1) and (obj1[0] == obj2[0])
+  # diagonal = True
+  diagonal = (abs(obj1[1] - obj2[1]) == 1) and (abs(obj1[0] - obj2[0]) == 1)
+  if (nearX or nearY) and not diagonal:
+    # print ("obj 1 is at position " + str(obj1))
+    # print ("obj 2 is at position " + str(obj2))
+    return True
+  else:
+    return False
+
+def isOn(obj1, obj2):
+  if (obj1[0] == obj2[0]) and (obj1[1] == obj2[1]):
+    return True
+  else:
+    return False
+
+def findNearestFood(position, foods):
+    closestDistance = -1
+    index = -1
+    for i in range(len(foods)):
+        distance = manhattanDistanceBetweenPoints(position, foods[i])
+        if distance > 0 and (index == -1 or distance <= closestDistance):
+            index = i
+            closestDistance = distance
+    if (index != -1):
+        return foods[index]
+    else:
+        return ()
+
+def manhattanDistanceBetweenPoints(point1, point2):
+    return abs(point1[0]-point2[0]) + abs(point1[1]-point2[1])
 
 def scoreEvaluationFunction(currentGameState):
     """
