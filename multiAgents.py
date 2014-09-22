@@ -208,7 +208,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         best_score = float('-inf')
         for move in legalMoves:
             clone = gameState.generateSuccessor(0, move)
-            score = self.min_play(clone, gameState.getNumAgents(), 0)
+            score = self.min_play(clone, gameState.getNumAgents(), 0, 0)
             # print score
             if score > best_score:
                 best_move = move
@@ -216,8 +216,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # print best_score
         return best_move
 
-    def min_play(self, game_state, num_agents, prev_agent):
-        if len(game_state.getLegalActions()) == 0:
+    def min_play(self, game_state, num_agents, prev_agent, count):
+        if (len(game_state.getLegalActions()) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
             return scoreEvaluationFunction(game_state)
         moves = game_state.getLegalActions()
         best_score = float('inf')
@@ -225,17 +225,17 @@ class MinimaxAgent(MultiAgentSearchAgent):
             newAgent = (prev_agent+1)%num_agents
             clone = game_state.generateSuccessor(newAgent, move)
             if (newAgent+1)%num_agents == 0:
-              score = self.max_play(clone, num_agents, newAgent)
+              score = self.max_play(clone, num_agents, newAgent, count+1)
             else:
-              score = self.min_play(clone, num_agents, newAgent)
+              score = self.min_play(clone, num_agents, newAgent, count+1)
             if score < best_score:
                 best_move = move
                 best_score = score
         # print best_score
         return best_score
 
-    def max_play(self, game_state, num_agents, prev_agent):
-        if len(game_state.getLegalActions()) == 0:
+    def max_play(self, game_state, num_agents, prev_agent, count):
+        if (len(game_state.getLegalActions()) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
             return scoreEvaluationFunction(game_state)
         moves = game_state.getLegalActions()
         best_score = float('-inf')
@@ -243,9 +243,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
             newAgent = (prev_agent+1)%num_agents
             clone = game_state.generateSuccessor(newAgent, move)
             if (newAgent+1)%num_agents == 0:
-              score = self.max_play(clone, num_agents, newAgent)
+              score = self.max_play(clone, num_agents, newAgent, count+1)
             else:
-              score = self.min_play(clone, num_agents, newAgent)
+              score = self.min_play(clone, num_agents, newAgent, count+1)
             if score > best_score:
                 best_move = move
                 best_score = score
