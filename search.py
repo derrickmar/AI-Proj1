@@ -138,8 +138,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     g_cost = 0
     f_cost = g_cost + heuristic(problem.getStartState(), problem)
     start_state = [problem.getStartState(), [], g_cost, f_cost] 
-    open_set = set(start_state)
-    closed_set = set()
+    open_set = [start_state]
+    closed_set = []
 
     while open_set:
         current = returnLowestFcost(open_set)
@@ -200,8 +200,6 @@ def returnLowestFcost(open_set):
         return answer
     else:
         print "something is wrong. List shouldn't be empty"
-
-
 
 # Abbreviations
 bfs = breadthFirstSearch
