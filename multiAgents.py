@@ -202,7 +202,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         
         # Collect legal moves and successor states
-        legalMoves = gameState.getLegalActions()
+        legalMoves = gameState.getLegalActions(0)
 
         best_move = legalMoves[0]
         best_score = float('-inf')
@@ -217,12 +217,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return best_move
 
     def min_play(self, game_state, num_agents, prev_agent, count):
-        if (len(game_state.getLegalActions()) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
+        newAgent = (prev_agent+1)%num_agents
+        if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
             return scoreEvaluationFunction(game_state)
-        moves = game_state.getLegalActions()
+        moves = game_state.getLegalActions(newAgent)
         best_score = float('inf')
         for move in moves:
-            newAgent = (prev_agent+1)%num_agents
             clone = game_state.generateSuccessor(newAgent, move)
             if (newAgent+1)%num_agents == 0:
               score = self.max_play(clone, num_agents, newAgent, count+1)
@@ -235,12 +235,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return best_score
 
     def max_play(self, game_state, num_agents, prev_agent, count):
-        if (len(game_state.getLegalActions()) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
+        newAgent = (prev_agent+1)%num_agents
+        if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
             return scoreEvaluationFunction(game_state)
-        moves = game_state.getLegalActions()
+        moves = game_state.getLegalActions(newAgent)
         best_score = float('-inf')
         for move in moves:
-            newAgent = (prev_agent+1)%num_agents
             clone = game_state.generateSuccessor(newAgent, move)
             if (newAgent+1)%num_agents == 0:
               score = self.max_play(clone, num_agents, newAgent, count+1)
