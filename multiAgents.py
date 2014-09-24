@@ -327,54 +327,47 @@ def betterEvaluationFunction(currentGameState):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 9).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: Our evaluation function takes the old evaluation from evaluationFunction and builds on that with four other factors:
+      currentFoodCount = Remaining food on the map. Multiplier of -8. The less the better.
+      closestFood = Calculates distance between current position and nearest food on the map. Multiplier of -1. The less the better.
+      currentCapsuleCount = Remaining capsules on the map. Multiplier of -3. The less the better.
+      scared = Adds to evaluation if ghosts are scared. Multiplier of 2. The more the better.
     """
+
+    if currentGameState.isWin():
+        return float("inf")
+    if currentGameState.isLose():
+        return float("-inf")
+
     # Useful information you can extract from a GameState (pacman.py)
     currentPacPos = currentGameState.getPacmanPosition()
     currentFood = currentGameState.getFood()
     currentGhostStates = currentGameState.getGhostStates()
     currentScaredTimes = [ghostState.scaredTimer for ghostState in currentGhostStates]
-    currentWalls = currentGameState.getWalls()
     currentCapsules = currentGameState.getCapsules()
 
-    numRows = currentWalls.count()
-    # numCols = len(currentWalls[0])
-    # furthestPossibleDistance = (numRows ** 2 + numCols ** 2) ** (1/2)
-    furthestPossibleDistance = currentWalls.count()
 
-    evaluation = 0
-    for ghostState in currentGhostStates:
-      # print "ghostPos"
-      # print(ghostState.getPosition())
-      if isNextTo(currentPacPos, ghostState.getPosition()):
-        if ghostState.scaredTimer > 0:
-          evaluation += 100
-        else:
-          evaluation -= 1000
-      if isNear(currentPacPos, ghostState.getPosition(), 2):
-        evaluation -= 200
-      if isOn(currentPacPos, ghostState.getPosition()):
-        if ghostState.scaredTimer > 0:
-          evaluation += 200
-        else:
-          evaluation -= 1000
-    # print "food"
-    # print(newFood.asList())
+    evaluation = scoreEvaluationFunction(currentGameState)
+
+    currentFoodCount = len(currentFood.asList())
+    evaluation -= 8.0 * currentFoodCount # less food, better
+
+    closestFood = float("inf")
     for food in currentFood.asList():
-      if isNextTo(currentPacPos, food):
-        evaluation += 200
-    for capsule in currentCapsules:
-      if manhattanDistanceBetweenPoints(currentPacPos, capsule) < 6:
-        evaluation += 20 * manhattanDistanceBetweenPoints(currentPacPos, capsule)
+      eachFoodDist = util.manhattanDistance(currentPacPos, food)
+      if eachFoodDist < closestFood:
+        closestFood = eachFoodDist
 
-    # print(evaluation)
-    if evaluation >= 0:
-      # print "evaluation >= 0"
-      nearestFood = findNearestFood(currentPacPos, currentFood.asList())
-      # print(nearestFood)
-      if nearestFood != ():
-        evaluation += 1 / (float(manhattanDistanceBetweenPoints(nearestFood, currentPacPos)) ** 2)
-      # head towards food
+    evaluation -= closestFood # move pacman towards nearest food
+
+    for scared in currentScaredTimes:
+      if scared > 0:
+        evaluation += 2 * scared
+
+
+    currentCapsuleCount = len(currentCapsules)
+    evaluation -= 3 * currentCapsuleCount # less capsules better
+
     return evaluation
 
 # Abbreviation
