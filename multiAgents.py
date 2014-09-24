@@ -126,6 +126,15 @@ def isNextTo(obj1, obj2):
   else:
     return False
 
+
+def isNear(obj1, obj2, distance):
+  nearX = (abs(obj1[0]-obj2[0]) <= distance)
+  nearY = (abs(obj1[1]-obj2[1]) <= distance)
+  if nearX and nearY:
+    return True
+  else:
+    return False
+
 def isOn(obj1, obj2):
   if (obj1[0] == obj2[0]) and (obj1[1] == obj2[1]):
     return True
@@ -219,7 +228,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def min_play(self, game_state, num_agents, prev_agent, count):
         newAgent = (prev_agent+1)%num_agents
         if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
-            return scoreEvaluationFunction(game_state)
+            return self.evaluationFunction(game_state)
         moves = game_state.getLegalActions(newAgent)
         best_score = float('inf')
         for move in moves:
@@ -236,7 +245,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def max_play(self, game_state, num_agents, prev_agent, count):
         newAgent = (prev_agent+1)%num_agents
         if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
-            return scoreEvaluationFunction(game_state)
+            return self.evaluationFunction(game_state)
         moves = game_state.getLegalActions(newAgent)
         best_score = float('-inf')
         for move in moves:
@@ -282,7 +291,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         newAgent = (prev_agent+1)%num_agents
         moves = game_state.getLegalActions(newAgent)
         if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
-            finalEval = scoreEvaluationFunction(game_state)
+            finalEval = self.evaluationFunction(game_state)
             return finalEval  
         best_score = float('inf')
         total_mini_score = 0
@@ -299,7 +308,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         newAgent = (prev_agent+1)%num_agents
         moves = game_state.getLegalActions(newAgent)
         if (len(game_state.getLegalActions(newAgent)) == 0) or ((count+1)%(game_state.getNumAgents()*self.depth) == 0):
-            finalEval = scoreEvaluationFunction(game_state)
+            finalEval = self.evaluationFunction(game_state)
             return finalEval
         best_score = float('-inf')
         for move in moves:
@@ -320,8 +329,53 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Useful information you can extract from a GameState (pacman.py)
+    currentPacPos = currentGameState.getPacmanPosition()
+    currentFood = currentGameState.getFood()
+    currentGhostStates = currentGameState.getGhostStates()
+    currentScaredTimes = [ghostState.scaredTimer for ghostState in currentGhostStates]
+    currentWalls = currentGameState.getWalls()
+    currentCapsules = currentGameState.getCapsules()
+
+    numRows = currentWalls.count()
+    # numCols = len(currentWalls[0])
+    # furthestPossibleDistance = (numRows ** 2 + numCols ** 2) ** (1/2)
+    furthestPossibleDistance = currentWalls.count()
+
+    evaluation = 0
+    for ghostState in currentGhostStates:
+      # print "ghostPos"
+      # print(ghostState.getPosition())
+      if isNextTo(currentPacPos, ghostState.getPosition()):
+        if ghostState.scaredTimer > 0:
+          evaluation += 100
+        else:
+          evaluation -= 1000
+      if isNear(currentPacPos, ghostState.getPosition(), 2):
+        evaluation -= 200
+      if isOn(currentPacPos, ghostState.getPosition()):
+        if ghostState.scaredTimer > 0:
+          evaluation += 200
+        else:
+          evaluation -= 1000
+    # print "food"
+    # print(newFood.asList())
+    for food in currentFood.asList():
+      if isNextTo(currentPacPos, food):
+        evaluation += 200
+    for capsule in currentCapsules:
+      if manhattanDistanceBetweenPoints(currentPacPos, capsule) < 6:
+        evaluation += 20 * manhattanDistanceBetweenPoints(currentPacPos, capsule)
+
+    # print(evaluation)
+    if evaluation >= 0:
+      # print "evaluation >= 0"
+      nearestFood = findNearestFood(currentPacPos, currentFood.asList())
+      # print(nearestFood)
+      if nearestFood != ():
+        evaluation += 1 / (float(manhattanDistanceBetweenPoints(nearestFood, currentPacPos)) ** 2)
+      # head towards food
+    return evaluation
 
 # Abbreviation
 better = betterEvaluationFunction
